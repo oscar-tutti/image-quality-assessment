@@ -3,7 +3,6 @@ import os
 import json
 import keras
 import numpy as np
-from scipy.stats import t
 
 
 def load_json(file_path):
