@@ -1,11 +1,12 @@
-
 import os
 import glob
 import json
 import argparse
-from utils.utils import calc_mean_score, save_json
+from utils.utils import calc_mean_score, calc_sd_score, calc_confidence_interval_score, save_json
 from handlers.model_builder import Nima
 from handlers.data_generator import TestDataGenerator
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
 def image_file_to_json(img_path):
@@ -31,6 +32,9 @@ def predict(model, data_generator):
 
 
 def main(base_model_name, weights_file, image_source, predictions_file, img_format='jpg'):
+    import tensorflow as tf
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+
     # load samples
     if os.path.isfile(image_source):
         image_dir, samples = image_file_to_json(image_source)
@@ -52,7 +56,9 @@ def main(base_model_name, weights_file, image_source, predictions_file, img_form
 
     # calc mean scores and add to samples
     for i, sample in enumerate(samples):
+        sample['predictions'] = predictions[i].tolist()
         sample['mean_score_prediction'] = calc_mean_score(predictions[i])
+        sample['sd_score_prediction'] = calc_sd_score(predictions[i])
 
     print(json.dumps(samples, indent=2))
 
