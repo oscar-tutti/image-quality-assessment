@@ -3,6 +3,7 @@ import os
 import json
 import keras
 import numpy as np
+from scipy.stats import t
 
 
 def load_json(file_path):
@@ -47,6 +48,12 @@ def normalize_labels(labels):
 def calc_mean_score(score_dist):
     score_dist = normalize_labels(score_dist)
     return (score_dist*np.arange(1, 11)).sum()
+
+
+def calc_sd_score(score_dist):
+    mean = calc_mean_score(score_dist)
+    score_dist = normalize_labels(score_dist)
+    return np.sqrt((np.square(np.arange(1, 11) - mean) * score_dist).sum())
 
 
 def ensure_dir_exists(dir):
